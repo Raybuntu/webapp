@@ -1,0 +1,17 @@
+[Unit]
+Description=Webapp
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+WorkingDirectory=/opt/webapp
+ExecStart=/usr/bin/python3 /opt/webapp/webapp.py
+ExecStop=/bin/kill -s SIGTERM $MAINPID
+User=webapp
+Group=webapp
+TimeoutStartSec=0
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
