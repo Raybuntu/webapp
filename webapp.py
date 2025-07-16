@@ -4,6 +4,7 @@ import socket
 import subprocess
 from googleapiclient import discovery
 from google.auth import compute_engine
+import os
 
 app = Flask(__name__)
 
@@ -43,8 +44,8 @@ def index():
         "http://metadata.google.internal/computeMetadata/v1/project/project-id",
         headers={"Metadata-Flavor": "Google"}
     ).text
-    region = "europe-west3"
-    mig_name = "si-mig"
+    region = os.environ.get("REGION")
+    mig_name = os.environ.get("MIG_NAME")
 
     mig = service.regionInstanceGroupManagers().get(
         project=project,
