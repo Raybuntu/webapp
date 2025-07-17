@@ -6,7 +6,6 @@ StartLimitBurst=3
 
 [Service]
 WorkingDirectory=/opt/webapp
-EnvironmentFile=/etc/webapp.env
 ExecStart=/usr/bin/python3 /opt/webapp/webapp.py
 ExecStop=/bin/kill -s SIGTERM $MAINPID
 User=webapp
