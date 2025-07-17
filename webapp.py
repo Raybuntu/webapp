@@ -4,7 +4,6 @@ import socket
 import subprocess
 from googleapiclient import discovery
 from google.auth import compute_engine
-import os
 
 app = Flask(__name__)
 
@@ -38,22 +37,33 @@ def index():
     hostname = socket.gethostname()
 
     # MIG Size
-    credentials = compute_engine.Credentials()
-    service = discovery.build('compute', 'v1', credentials=credentials)
-    project = requests.get(
-        "http://metadata.google.internal/computeMetadata/v1/project/project-id",
-        headers={"Metadata-Flavor": "Google"}
-    ).text
-    region = os.environ.get("REGION")
-    mig_name = os.environ.get("MIG_NAME")
+    try:
+        credentials = compute_engine.Credentials()
+        service = discovery.build('compute', 'v1', credentials=credentials)
+        project = requests.get(
+            "http://metadata.google.internal/computeMetadata/v1/project/project-id",
+            headers={"Metadata-Flavor": "Google"}
+        ).text
+        zone_full = requests.get(
+            "http://metadata.google.internal/computeMetadata/v1/instance/zone",
+            headers={"Metadata-Flavor": "Google"}
+        ).text
+        zone = zone_full.split('/')[-1]
+        region = '-'.join(zone.split('-')[:-1])
+        mig_name = requests.get(
+            "http://metadata.google.internal/computeMetadata/v1/instance/attributes/mig-name",
+            headers={"Metadata-Flavor": "Google"}
+        ).text
 
-    mig = service.regionInstanceGroupManagers().get(
-        project=project,
-        region=region,
-        instanceGroupManager=mig_name
-    ).execute()
+        mig = service.regionInstanceGroupManagers().get(
+            project=project,
+            region=region,
+            instanceGroupManager=mig_name
+        ).execute()
 
-    mig_size = mig.get("targetSize", "unknown")
+        mig_size = mig.get("targetSize", "unknown")
+    except:
+        mig_size = "unknown"
 
     return render_template_string(HTML_TEMPLATE,
                                   private_ip=private_ip,
