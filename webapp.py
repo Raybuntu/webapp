@@ -50,15 +50,15 @@ def index():
         ).text
         zone = zone_full.split('/')[-1]
         region = '-'.join(zone.split('-')[:-1])
-        mig_name = requests.get(
-            "http://metadata.google.internal/computeMetadata/v1/instance/attributes/mig-name",
+        mig_prefix = requests.get(
+            "http://metadata.google.internal/computeMetadata/v1/instance/attributes/mig-prefix",
             headers={"Metadata-Flavor": "Google"}
         ).text
 
         mig = service.regionInstanceGroupManagers().get(
             project=project,
             region=region,
-            instanceGroupManager=mig_name
+            instanceGroupManager=f"{mig_prefix}-{region}"
         ).execute()
 
         mig_size = mig.get("targetSize", "unknown")
