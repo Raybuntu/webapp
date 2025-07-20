@@ -55,6 +55,7 @@ def index():
             headers={"Metadata-Flavor": "Google"}
         ).text
 
+        # Get mig info
         mig = service.regionInstanceGroupManagers().get(
             project=project,
             region=region,
