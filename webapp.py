@@ -66,6 +66,7 @@ def index():
     except:
         mig_size = "unknown"
 
+    # Render the template
     return render_template_string(HTML_TEMPLATE,
                                   private_ip=private_ip,
                                   hostname=hostname,
